@@ -29,10 +29,10 @@ class FLServerInit:
                  ):
         self.mongo_url = mongo_url
         self.proxies = {
-            "http": "http://proxy.in.tum.de:8080/",
-            "https": "http://proxy.in.tum.de:8080/",
-            "ftp": "ftp://proxy.in.tum.de:8080/",
-            "no_proxy": "172.24.65.16"
+            # "http": "http://proxy.in.tum.de:8080/",
+            # "https": "http://proxy.in.tum.de:8080/",
+            # "ftp": "ftp://proxy.in.tum.de:8080/",
+            # "no_proxy": "172.24.65.16"
         }
         self.mongo_db = mongo_db
         self.collection_name = collection_name
@@ -178,19 +178,24 @@ class FLServerInit:
 
     def write_data_dict_to_server(self):
 
-        data_clients  = self.mnist_noniid()
-        keys = ["data_client_" + str(i) for i in range(self.config['num_clients'])]
-        for i in range(len(keys)):
-            document = self.collection.find_one({'key': keys[i]})
-            if(document):
-                filter = {'key': keys[i]}
-                new_values = {'$set': {'data': data_clients[str(i)].tolist()}}
-                result = self.collection.update_one(filter, new_values)
-                print("Data updated with id {0} for Client {1}".format(result, keys[i]))
-            else:
-                values = {'key': keys[i], 'data': data_clients[str(i)].tolist()}
-                result = self.collection.insert_one(values)
-                print("Data inserted with id {0}".format(result.inserted_id))
+        try:
+            data_clients  = self.mnist_noniid()
+            keys = ["data_client_" + str(i) for i in range(self.config['num_clients'])]
+            for i in range(len(keys)):
+                document = self.collection.find_one({'key': keys[i]})
+                if(document):
+                    filter = {'key': keys[i]}
+                    new_values = {'$set': {'data': data_clients[str(i)].tolist()}}
+                    result = self.collection.update_one(filter, new_values)
+                    print("Data updated with id {0} for Client {1}".format(result, keys[i]))
+                else:
+                    values = {'key': keys[i], 'data': data_clients[str(i)].tolist()}
+                    result = self.collection.insert_one(values)
+                    print("Data inserted with id {0}".format(result.inserted_id))
+            return 'Success'
+        
+        except Exception as e:
+            return str(e)
 
     def initialize_clients(self):
         keys = ["client_" + str(i) for i in range(self.config['num_clients'])]
@@ -221,13 +226,19 @@ def main(params):
                                           params["data_sampling"]["batch_size"],
                                           params["num_clients"],
                                           params["data_sampling"]["model"],)
+        
+        # return {'Success' : 'Successfully created fl_server_init_obj with Params:', 'Params' : params}
 
     except:
         return {'Error': 'Input parameters should include a string to sentiment analyse.'}
         
-    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+    try:
+        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+    except:
+        return {'Error': 'Could not set CUDA_VISIBLE_DEVICES'}
 
-    fl_server_init_obj.write_data_dict_to_server()
+    status = fl_server_init_obj.write_data_dict_to_server()
+    return{'Status': str(status)}
 
     if fl_server_init_obj.config['model'] == "cnn":
         server_model = fl_server_init_obj.create_model_cnn()
