@@ -320,9 +320,10 @@ class FederatedLearning:
                 logger.info("Step1: Invoking Initialize function for the weights init")
                 fl_server_init_params_path = data['scenarios']['federated_learning']['functions'][
                     'fl_server_init']['openwhisk']['params_file_path']
-                metrics = openwhisk_obj.invoke_function("fl_server_init",
-                                                        fl_server_init_params_path)
+                print("Invoking: wsk action invoke fl_server_init -P " + fl_server_init_params_path)
+                metrics = openwhisk_obj.invoke_function("fl_server_init", fl_server_init_params_path)
 
+                print(metrics)
 
                 logger.info("Num Clients per rounds: {0}".format(num_clients_per_round))
                 start_time_total = time.time()
@@ -347,6 +348,7 @@ class FederatedLearning:
 
                     for index, client in enumerate(round_clients):
 
+                        print(index, client)
                         func_name = 'fl_invoker_weights_update' + str(client)
                         #start_time_fun_process = time.time()
                         # print(func_name)
@@ -366,8 +368,12 @@ class FederatedLearning:
                     end_invocation_time = time.time()
                     cluster_data = data['providers']['openwhisk']['invasic_cluster']
 
+                    print(activations_df)
+
+                    print("CHECKING IF ALL ACTIVATIONS COMPLETED...")
                     activations_df = openwhisk_obj.check_if_all_activations_completed(
                         cluster_data, activation_ids, client_activation_map, activations_df)
+                    print("ALL ACTIVATIONS COMPLETED")
 
                     activations_df["diff"] = activations_df["end_time"] - activations_df["start_time"]
 
