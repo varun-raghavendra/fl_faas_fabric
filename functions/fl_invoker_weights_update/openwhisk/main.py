@@ -10,17 +10,17 @@ class FLServerUpdateInvoke:
 
     def __init__(self, mongo_url, mongo_db, collection_name):
         self.mongo_url = mongo_url
-        self.proxies = {
-            "http": "http://proxy.in.tum.de:8080/",
-            "https": "http://proxy.in.tum.de:8080/",
-            "ftp": "ftp://proxy.in.tum.de:8080/",
-            "no_proxy": "172.24.65.16"
-        }
+        # self.proxies = {  
+        #     "http": "http://proxy.in.tum.de:8080/",
+        #     "https": "http://proxy.in.tum.de:8080/",
+        #     "ftp": "ftp://proxy.in.tum.de:8080/",
+        #     "no_proxy": "172.24.65.16"
+        # }
         self.mongo_db = mongo_db
         self.collection_name = collection_name
 
         client = MongoClient(self.mongo_url)
-        db = client[self.mongo_db]
+        db = client[self.mongo_db]  
         self.collection = db[self.collection_name]
 
     def get_data_from_server(self, client_id_num):
@@ -55,6 +55,7 @@ class FLServerUpdateInvoke:
 
 
 def main(params):
+    print(params)
     try:
         client_id = params["client_id"]
         url = params["url"]
@@ -62,14 +63,17 @@ def main(params):
         fl_server_update_invoke_obj = FLServerUpdateInvoke("mongodb://" + params["mongo"]["url"] + "/",
                                                            params["mongo"]["db"],
                                                            params["mongo"]["collection"])
-
+        print(fl_server_update_invoke_obj)
     except:
         return {'Error': 'Input parameters doesnot contain client_id or url'}
 
     data = {}
     ret_val = {}
+    print("Trying to get data from server")
     data["client"] = fl_server_update_invoke_obj.get_data_from_server(client_id)
     data["server"] = fl_server_update_invoke_obj.get_weights_from_server()
+    print("Got data from server")
+    print(data["server"])
     data["train_images_url"] = params["train_images_url"]
     data["train_labels_url"] = params["train_labels_url"]
     data["train_labels_url"] = params["train_labels_url"]
@@ -82,6 +86,9 @@ def main(params):
     data["lr"] = params["lr"]
     data["optim"] = params["optim"]
     data["local_epochs"] = params["local_epochs"]
+
+    # print("Printing dictionary data")
+    # print(data)
 
     data = bson.BSON.encode(data)
     if "cloud" in client_type:
