@@ -8,6 +8,7 @@ import logging
 import yaml
 import time
 from pandas import DataFrame
+import pandas as pd
 
 from commons.Logger import ScriptLogger
 logging.basicConfig(level=logging.DEBUG)
@@ -100,16 +101,20 @@ class OpenWhiskDeployment(BaseDeployment):
 
     def invoke_function(self, function_name: str, param_file: str = None) -> list:
         metrics = []
+        print(param_file)
         if param_file:
             process = subprocess.Popen(["wsk", "action", "invoke", function_name, "-P", param_file, "-i", "-r"],
                                        stdout=subprocess.PIPE)
         else:
             process = subprocess.Popen(["wsk", "action", "invoke", function_name, "-i", "-r"],
                                        stdout=subprocess.PIPE)
+
         while True:
 
+            # print("Entered while loop")
+            print("Process Line:")
             line = process.stdout.readline()
-            # print(line.decode('utf-8'))
+            print(line.decode('utf-8'))
             if "accuracy" in line.decode('utf-8'):
                 acc = line.decode('utf-8').strip().replace(',', '').split("\"accuracy\": ")
                 # print(acc)
@@ -119,6 +124,7 @@ class OpenWhiskDeployment(BaseDeployment):
                 # print(loss)
                 metrics.append(loss[1])
             if not line:
+                print("Exiting while loop")
                 break
             # logger.info(line.decode('utf-8'))
 
@@ -128,12 +134,14 @@ class OpenWhiskDeployment(BaseDeployment):
         "Asssuming one function called per invocation"
         time.sleep(0.05)
         activation_id = ""
+        print("Executing FL INIT process")
         print("wsk action invoke ", function_name, "-P ", param_file, "-i")
         if param_file:
             process = subprocess.Popen(["wsk", "action", "invoke", function_name, "-P", param_file, "-i"],
                                        stdout=subprocess.PIPE)
         else:
             process = subprocess.Popen(["wsk", "action", "invoke", function_name, "-i"], stdout=subprocess.PIPE)
+        print("INIT executed with no error")
         while True:
             line = process.stdout.readline()
             if "id" in line.decode('utf-8'):
