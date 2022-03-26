@@ -117,10 +117,11 @@ def main(params):
             data = dumps(data)
             data = json.loads(data)
             try:
-                client_response = requests.post(url, allow_redirects=True, json=data, verify=False)
+                params={'blocking': True, 'result': True}
+                client_response = requests.post(url, allow_redirects=True, json=data, verify=False, params=params)
                 client_new_weights = client_response.content
                 client_response.raise_for_status()
-                return {'Response' : client_response.content}
+                # return {'Response' : client_response.content}
             except requests.exceptions.HTTPError as httpErr:
                 return {'ErrorName' : 'httpErr', 'Error' : str(httpErr), 'payloadSize' : sys.getsizeof(data)}
                 ret_val['Error'] = url

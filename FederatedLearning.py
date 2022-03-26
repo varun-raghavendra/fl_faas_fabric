@@ -95,7 +95,7 @@ class FederatedLearning:
             json.dump(data, outfile, indent=4)
 
     async def create_usage_num_clients_param_file(self, num_clients, clients_param_info_object, path_to_init_function):
-        client_ids = ["client_" + str(i) for i in range(0, num_clients + 0)]
+        client_ids = ["data_client_" + str(i) for i in range(0, num_clients + 0)]
         data = {
             "num_clients": num_clients,
             "train_images_url": clients_param_info_object["training_test_data"]["train_images_url"],
@@ -327,10 +327,10 @@ class FederatedLearning:
 
                 logger.info("Num Clients per rounds: {0}".format(num_clients_per_round))
                 start_time_total = time.time()
-                while acc < 0.990:
+                while acc < 0.75:
                     activation_ids = []
                     round_clients = np.random.choice(np.arange(total_clients), num_clients_per_round, replace=False)
-                    client_round_ids = ["client_" +  str(i) for i in round_clients]
+                    client_round_ids = ["data_client_" +  str(i) for i in round_clients]
                     logger.info("Iter: {0}, Clients: {1}".format(iter, client_round_ids))
                     self.update_usage_num_clients_param_file("params/usage_num_clients.json", client_round_ids)
 
@@ -378,11 +378,15 @@ class FederatedLearning:
 
                     activations_df["diff"] = activations_df["end_time"] - activations_df["start_time"]
 
-                    csv_file_name = "logs/csvs/" + data['scenarios']['federated_learning']['model_params'][
-                        'local_epochs'] + "_" + data['scenarios']['federated_learning']['data_sampling'][
-                        'model'] + "/"
-                    activations_df.to_csv(csv_file_name + str(iter) + ".csv")
+                    # csv_file_name = "logs/csvs/" + data['scenarios']['federated_learning']['model_params'][
+                    #     'local_epochs'] + "_" + data['scenarios']['federated_learning']['data_sampling'][
+                    #     'model'] + "/"
+                    # activations_df.to_csv(csv_file_name + str(iter) + ".csv")
                     start_time_agg = time.time()
+
+                    print("fl server aggregator params path: "+ data['scenarios']['federated_learning']['functions'][
+                        'fl_server_aggregator']['openwhisk']['params_file_path'])
+
                     fl_server_aggregator_params_path = data['scenarios']['federated_learning']['functions'][
                         'fl_server_aggregator']['openwhisk']['params_file_path']
 

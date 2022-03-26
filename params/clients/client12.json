@@ -1,5 +1,7 @@
 {
-    "num_clients": 14,
+    "client_id": "12",
+    "client_type": "cloud",
+    "url": "https://us-central1-turnkey-thought-342917.cloudfunctions.net/client_12",
     "train_images_url": "https://storage.googleapis.com/mnist_fl/mnist_train_img.obj",
     "train_labels_url": "https://storage.googleapis.com/mnist_fl/mnist_train_labels.obj",
     "test_images_url": "https://storage.googleapis.com/mnist_fl/mnist_test_img.obj",
@@ -18,20 +20,8 @@
         "batch_size": 10,
         "model": "cnn"
     },
-    "client_round_ids": [
-        "data_client_0",
-        "data_client_1",
-        "data_client_2",
-        "data_client_3",
-        "data_client_4",
-        "data_client_5",
-        "data_client_6",
-        "data_client_7",
-        "data_client_8",
-        "data_client_9",
-        "data_client_10",
-        "data_client_11",
-        "data_client_12",
-        "data_client_13"
-    ]
+    "model": "cnn",
+    "lr": "1e-3",
+    "optim": "adam",
+    "local_epochs": "15"
 }

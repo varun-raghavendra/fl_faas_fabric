@@ -1,5 +1,5 @@
 {
-    "num_clients": 1,
+    "num_clients": 14,
     "train_images_url": "https://storage.googleapis.com/mnist_fl/mnist_train_img.obj",
     "train_labels_url": "https://storage.googleapis.com/mnist_fl/mnist_train_labels.obj",
     "test_images_url": "https://storage.googleapis.com/mnist_fl/mnist_test_img.obj",

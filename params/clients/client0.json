@@ -23,5 +23,5 @@
     "model": "cnn",
     "lr": "1e-3",
     "optim": "adam",
-    "local_epochs": "5"
+    "local_epochs": "15"
 }

@@ -213,6 +213,8 @@ def main(params):
                                         params["data_sampling"]["model"],
                                         )
 
+        # return {'Success': 'Operation Success'}
+
     except:
         return {'Error': 'Input parameters should include a string to sentiment analyse.'}
 
@@ -227,7 +229,6 @@ def main(params):
         server_model = fl_server_agg_obj.create_model_cnn()
     else:
         server_model = fl_server_agg_obj.create_model()
-
 
     client_weights_list = fl_server_agg_obj.get_weights_from_clients(fl_server_agg_obj.config['client_keys'])
     cardinalities_client = fl_server_agg_obj.get_cardinality_from_clients(fl_server_agg_obj.config['client_keys'])
