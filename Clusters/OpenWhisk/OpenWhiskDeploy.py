@@ -134,16 +134,17 @@ class OpenWhiskDeployment(BaseDeployment):
         "Asssuming one function called per invocation"
         time.sleep(0.05)
         activation_id = ""
-        print("Executing FL INIT process")
+        # print("Executing FL INIT process")
         print("wsk action invoke ", function_name, "-P ", param_file, "-i")
         if param_file:
             process = subprocess.Popen(["wsk", "action", "invoke", function_name, "-P", param_file, "-i"],
                                        stdout=subprocess.PIPE)
         else:
             process = subprocess.Popen(["wsk", "action", "invoke", function_name, "-i"], stdout=subprocess.PIPE)
-        print("INIT executed with no error")
+        # print("INIT executed with no error")
         while True:
             line = process.stdout.readline()
+            print(line)
             if "id" in line.decode('utf-8'):
                 activation_id = line.decode('utf-8').strip().split("id ")
                 activation_id = activation_id[1]

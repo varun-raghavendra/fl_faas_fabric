@@ -29,10 +29,10 @@ class FLServerAgg:
                  ):
         self.mongo_url = mongo_url
         self.proxies = {
-            "http": "http://proxy.in.tum.de:8080/",
-            "https": "http://proxy.in.tum.de:8080/",
-            "ftp": "ftp://proxy.in.tum.de:8080/",
-            "no_proxy": "172.24.65.16"
+            # "http": "http://proxy.in.tum.de:8080/",
+            # "https": "http://proxy.in.tum.de:8080/",
+            # "ftp": "ftp://proxy.in.tum.de:8080/",
+            # "no_proxy": "172.24.65.16"
         }
         self.mongo_db = mongo_db
         self.collection_name = collection_name
@@ -196,7 +196,7 @@ class FLServerAgg:
 
 def main(params):
     try:
-        fl_server_agg_obj = FLServerAgg("mongodb://" + params["mongo"]["url"] + "/",
+        fl_server_agg_obj = FLServerAgg(params["mongo"]["url"],
                                         params["mongo"]["db"],
                                         params["mongo"]["collection"],
                                         params["train_images_url"],

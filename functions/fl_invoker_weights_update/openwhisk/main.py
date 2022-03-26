@@ -4,12 +4,14 @@ import requests
 from bson.json_util import loads
 from bson.json_util import dumps
 import json
+import sys
 
 
 class FLServerUpdateInvoke:
 
     def __init__(self, mongo_url, mongo_db, collection_name):
         self.mongo_url = mongo_url
+        self.proxies = {}
         # self.proxies = {  
         #     "http": "http://proxy.in.tum.de:8080/",
         #     "https": "http://proxy.in.tum.de:8080/",
@@ -60,7 +62,7 @@ def main(params):
         client_id = params["client_id"]
         url = params["url"]
         client_type = params["client_type"]
-        fl_server_update_invoke_obj = FLServerUpdateInvoke("mongodb://" + params["mongo"]["url"] + "/",
+        fl_server_update_invoke_obj = FLServerUpdateInvoke(params["mongo"]["url"],
                                                            params["mongo"]["db"],
                                                            params["mongo"]["collection"])
         print(fl_server_update_invoke_obj)
@@ -70,95 +72,115 @@ def main(params):
     data = {}
     ret_val = {}
     print("Trying to get data from server")
-    data["client"] = fl_server_update_invoke_obj.get_data_from_server(client_id)
-    data["server"] = fl_server_update_invoke_obj.get_weights_from_server()
-    print("Got data from server")
-    print(data["server"])
-    data["train_images_url"] = params["train_images_url"]
-    data["train_labels_url"] = params["train_labels_url"]
-    data["train_labels_url"] = params["train_labels_url"]
-    data["test_images_url"] = params["test_images_url"]
-    data["test_labels_url"] = params["test_labels_url"]
-    data["data_sampling"] = params["data_sampling"]
-    data["model"] = params["model"]
 
+    try:
+        data["client"] = fl_server_update_invoke_obj.get_data_from_server(client_id)
+        data["server"] = fl_server_update_invoke_obj.get_weights_from_server()
+        print(data["server"])
+        data["train_images_url"] = params["train_images_url"]
+        data["train_labels_url"] = params["train_labels_url"]
+        # data["train_labels_url"] = params["train_labels_url"]
+        data["test_images_url"] = params["test_images_url"]
+        data["test_labels_url"] = params["test_labels_url"]
+        data["data_sampling"] = params["data_sampling"]
+        data["model"] = params["model"]
 
-    data["lr"] = params["lr"]
-    data["optim"] = params["optim"]
-    data["local_epochs"] = params["local_epochs"]
+        data["lr"] = params["lr"]
+        data["optim"] = params["optim"]
+        data["local_epochs"] = params["local_epochs"]
 
     # print("Printing dictionary data")
     # print(data)
 
-    data = bson.BSON.encode(data)
-    if "cloud" in client_type:
-        try:
-            client_response = requests.post(url,
-                                           allow_redirects=False, data=data,
-                                           proxies=fl_server_update_invoke_obj.proxies)
-            client_new_weights = client_response.content
-            client_response.raise_for_status()
-        except requests.exceptions.HTTPError as httpErr:
-            ret_val['Error'] = url
-            return ret_val
-        except requests.exceptions.ConnectionError as connErr: 
-            ret_val['Error'] = connErr
-            return ret_val
-        except requests.exceptions.Timeout as timeOutErr:
-            ret_val['Error'] = timeOutErr  
-            return ret_val
-        except requests.exceptions.RequestException as reqErr:
-            ret_val['Error'] = reqErr  
-            return ret_val
-    elif "openwhisk" in client_type:
-        data = dumps(data)
-        data = json.loads(data)
-        try:
-            client_response = requests.post(url, allow_redirects=False, json=data, verify=False)
-            client_new_weights = client_response.content
-            client_response.raise_for_status()
-        except requests.exceptions.HTTPError as httpErr:
-            ret_val['Error'] = url
-            return ret_val
-        except requests.exceptions.ConnectionError as connErr: 
-            ret_val['Error'] = connErr
-            return ret_val
-        except requests.exceptions.Timeout as timeOutErr:
-            ret_val['Error'] = timeOutErr  
-            return ret_val
-        except requests.exceptions.RequestException as reqErr:
-            ret_val['Error'] = reqErr  
-            return ret_val
-        #client_new_weights = requests.post(url,
-                                        #    allow_redirects=True, json=data, verify=False, timeout=600).content
-    else:
-        try: 
-            client_response = requests.post(url, allow_redirects=False, data=data, verify=False)
-            client_new_weights = client_response.content
-            client_response.raise_for_status()
-        except requests.exceptions.HTTPError as httpErr:
-            ret_val['Error'] = httpErr
-            return ret_val
-        except requests.exceptions.ConnectionError as connErr: 
-            ret_val['Error'] = connErr
-            return ret_val
-        except requests.exceptions.Timeout as timeOutErr:
-            ret_val['Error'] = timeOutErr  
-            return ret_val
-        except requests.exceptions.RequestException as reqErr:
-            ret_val['Error'] = reqErr  
-            return ret_val
-        # client_new_weights = requests.post(url,
-        #                                    allow_redirects=True, data=data, verify=False, timeout=600).content
+        data = bson.BSON.encode(data)
+        # data2 = data
+        if "cloud" in client_type:
+            try:
+                client_response = requests.post(url,
+                                            allow_redirects=False, data=data,
+                                            proxies=fl_server_update_invoke_obj.proxies)
+                client_new_weights = client_response.content
+                client_response.raise_for_status()
+            except requests.exceptions.HTTPError as httpErr:
+                ret_val['Error'] = url
+                return ret_val
+            except requests.exceptions.ConnectionError as connErr: 
+                ret_val['Error'] = connErr
+                return ret_val
+            except requests.exceptions.Timeout as timeOutErr:
+                ret_val['Error'] = timeOutErr  
+                return ret_val
+            except requests.exceptions.RequestException as reqErr:
+                ret_val['Error'] = reqErr  
+                return ret_val
+        elif "openwhisk" in client_type:
+            data = dumps(data)
+            data = json.loads(data)
+            try:
+                client_response = requests.post(url, allow_redirects=True, json=data, verify=False)
+                client_new_weights = client_response.content
+                client_response.raise_for_status()
+                return {'Response' : client_response.content}
+            except requests.exceptions.HTTPError as httpErr:
+                return {'ErrorName' : 'httpErr', 'Error' : str(httpErr), 'payloadSize' : sys.getsizeof(data)}
+                ret_val['Error'] = url
+                return ret_val
+            except requests.exceptions.ConnectionError as connErr: 
+                return {'ErrorName' : 'connErr', 'Error' : str(connErr)}
+                ret_val['Error'] = connErr
+                return ret_val
+            except requests.exceptions.Timeout as timeOutErr:
+                return {'ErrorName' : 'timeOutErr', 'Error' : str(timeOutErr)}
+                ret_val['Error'] = timeOutErr  
+                return ret_val
+            except requests.exceptions.RequestException as reqErr:
+                return {'ErrorName' : 'reqErr', 'Error' : str(reqErr)}
+                ret_val['Error'] = reqErr  
+                return ret_val
+            #client_new_weights = requests.post(url,
+                                            #    allow_redirects=True, json=data, verify=False, timeout=600).content
+        else:
+            try: 
+                client_response = requests.post(url, allow_redirects=False, data=data, verify=False)
+                client_new_weights = client_response.content
+                client_response.raise_for_status()
+            except requests.exceptions.HTTPError as httpErr:
+                return {'ErrorName' : 'httpErr', 'Error' : str(httpErr)}
+                ret_val['Error'] = httpErr
+                return ret_val
+            except requests.exceptions.ConnectionError as connErr: 
+                return {'ErrorName' : 'connErr', 'Error' : str(connErr)}
+                ret_val['Error'] = connErr
+                return ret_val
+            except requests.exceptions.Timeout as timeOutErr:
+                return {'ErrorName' : 'timeOutErr', 'Error' : str(timeOutErr)}
+                ret_val['Error'] = timeOutErr  
+                return ret_val
+            except requests.exceptions.RequestException as reqErr:
+                return {'ErrorName' : 'reqErr', 'Error' : str(reqErr)}
+                ret_val['Error'] = reqErr  
+                return ret_val
+            # client_new_weights = requests.post(url,
+            #                                    allow_redirects=True, data=data, verify=False, timeout=600).content
 
-    client_new_weights = loads(client_new_weights)
+        # return {'Success': 'Operation success'}
 
-    client_new_weights = bson.BSON(client_new_weights).decode()
+    except Exception as e:
+        return {'Error': str(e)}
 
-    fl_server_update_invoke_obj.write_updated_weights_client(client_new_weights["weights"],
-                                                             client_new_weights["cardinality"],
-                                                             "client_" + str(client_id))
+    try:
+        client_new_weights = loads(client_new_weights)
 
+        client_new_weights = bson.BSON(client_new_weights).decode()
+
+        fl_server_update_invoke_obj.write_updated_weights_client(client_new_weights["weights"],
+                                                                client_new_weights["cardinality"],
+                                                                "data_client_" + str(client_id))
+
+        # return {'Success' : 'Operation Success'}
+
+    except Exception as e:
+        return {'Error' : str(e)}
     
     ret_val['result'] = "executed_Client_" + str(client_id)
     # ret_val['result'] = "executed_Client_" + str(data["lr"])

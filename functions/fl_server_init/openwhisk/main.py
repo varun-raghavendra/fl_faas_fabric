@@ -211,7 +211,7 @@ class FLServerInit:
 
 def main(params):
     try:
-        fl_server_init_obj = FLServerInit("mongodb://" + params["mongo"]["url"] + "/",
+        fl_server_init_obj = FLServerInit(params["mongo"]["url"],
                                           params["mongo"]["db"],
                                           params["mongo"]["collection"],
                                           params["train_images_url"],
@@ -238,7 +238,7 @@ def main(params):
         return {'Error': 'Could not set CUDA_VISIBLE_DEVICES'}
 
     status = fl_server_init_obj.write_data_dict_to_server()
-    return{'Status': str(status)}
+    # return{'Status': str(status)}
 
     if fl_server_init_obj.config['model'] == "cnn":
         server_model = fl_server_init_obj.create_model_cnn()

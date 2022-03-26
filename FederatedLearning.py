@@ -58,7 +58,7 @@ class FederatedLearning:
                                    path_to_client_function):
         client_ids = [str(i) for i in range(start_num, num_clients + start_num)]
 
-        urls = [base_url + "client" + str(i) for i in client_ids]
+        urls = [base_url + "client_" + str(i) for i in client_ids]
         for i in range(num_clients):
             data = {}
             data["client_id"] = client_ids[i]
@@ -85,9 +85,9 @@ class FederatedLearning:
         data = {
             "num_clients": num_clients,
             "train_images_url": clients_param_info_object["training_test_data"]["train_images_url"],
-            "train_labels_url": clients_param_info_object["training_test_data"]["train_images_url"],
-            "test_images_url": clients_param_info_object["training_test_data"]["train_images_url"],
-            "test_labels_url": clients_param_info_object["training_test_data"]["train_images_url"],
+            "train_labels_url": clients_param_info_object["training_test_data"]["train_labels_url"],
+            "test_images_url": clients_param_info_object["training_test_data"]["test_images_url"],
+            "test_labels_url": clients_param_info_object["training_test_data"]["test_labels_url"],
             "mongo": clients_param_info_object["mongo_config"],
             "data_sampling": clients_param_info_object["data_sampling"]
         }
@@ -99,9 +99,9 @@ class FederatedLearning:
         data = {
             "num_clients": num_clients,
             "train_images_url": clients_param_info_object["training_test_data"]["train_images_url"],
-            "train_labels_url": clients_param_info_object["training_test_data"]["train_images_url"],
-            "test_images_url": clients_param_info_object["training_test_data"]["train_images_url"],
-            "test_labels_url": clients_param_info_object["training_test_data"]["train_images_url"],
+            "train_labels_url": clients_param_info_object["training_test_data"]["train_labels_url"],
+            "test_images_url": clients_param_info_object["training_test_data"]["test_images_url"],
+            "test_labels_url": clients_param_info_object["training_test_data"]["test_labels_url"],
             "mongo": clients_param_info_object["mongo_config"],
             "data_sampling": clients_param_info_object["data_sampling"],
             "client_round_ids": client_ids
@@ -353,6 +353,7 @@ class FederatedLearning:
                         #start_time_fun_process = time.time()
                         # print(func_name)
                         act_start_time = time.time()
+                        print("invoking function " + fl_clients_base_path + 'client' + str(client) + '.json')
                         activation_id = openwhisk_obj.invoke_function_nb(func_name,
                                                                          fl_clients_base_path + 'client' +
                                                                          str(client) + ".json")

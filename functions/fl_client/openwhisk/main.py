@@ -28,10 +28,10 @@ class Client:
                  ):
 
         self.proxies = {
-            "http": "http://proxy.in.tum.de:8080/",
-            "https": "http://proxy.in.tum.de:8080/",
-            "ftp": "ftp://proxy.in.tum.de:8080/",
-            "no_proxy": "172.24.65.16"
+            # "http": "http://proxy.in.tum.de:8080/",
+            # "https": "http://proxy.in.tum.de:8080/",
+            # "ftp": "ftp://proxy.in.tum.de:8080/",
+            # "no_proxy": "172.24.65.16"
         }
         self.client_id = 0
         self.data_client = data_client
@@ -217,4 +217,7 @@ def main(request):
     new_weights = client_obj.write_updated_weights_client(updated_weights, cardinality)
 
     new_weights = bson.BSON.encode(new_weights)
+
+    print("Returning value to weights update function")
+    
     return json.loads(dumps(new_weights))
