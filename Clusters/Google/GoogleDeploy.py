@@ -50,6 +50,7 @@ class GoogleDeployment(BaseDeployment):
         self.authentication(config_object["auth"])
 
         # Step 2: Final Deploy
+        print("Project ID is " + config_object["auth"]["project_id"])
         process = subprocess.Popen(
             ["gcloud", "functions", "deploy", func_name,
              "--region", fun_object["region"],

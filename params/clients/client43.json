@@ -1,7 +1,7 @@
 {
-    "client_id": "8",
+    "client_id": "43",
     "client_type": "cloud",
-    "url": "https://us-central1-turnkey-thought-342917.cloudfunctions.net/client_8",
+    "url": "https://us-central1-turnkey-thought-342917.cloudfunctions.net/client_43",
     "train_images_url": "https://storage.googleapis.com/mnist_fl/mnist_train_img.obj",
     "train_labels_url": "https://storage.googleapis.com/mnist_fl/mnist_train_labels.obj",
     "test_images_url": "https://storage.googleapis.com/mnist_fl/mnist_test_img.obj",

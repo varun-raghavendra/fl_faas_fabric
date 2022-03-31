@@ -1,11 +1,11 @@
 {
-    "num_clients": 14,
+    "num_clients": 53,
     "train_images_url": "https://storage.googleapis.com/mnist_fl/mnist_train_img.obj",
     "train_labels_url": "https://storage.googleapis.com/mnist_fl/mnist_train_labels.obj",
     "test_images_url": "https://storage.googleapis.com/mnist_fl/mnist_test_img.obj",
     "test_labels_url": "https://storage.googleapis.com/mnist_fl/mnist_test_labels.obj",
     "mongo": {
-        "url": "34.134.77.194:32002",
+        "url": "34.136.68.222:32002",
         "db": "flweights",
         "collection": "mnist_weights"
     },
